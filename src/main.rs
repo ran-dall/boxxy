@@ -219,7 +219,7 @@ fn scan_homedir(apps: Vec<App>) -> Result<()> {
         warn!("report bad rules!! https://github.com/queer/boxxy/issues/new");
         info!("rules generated: {}", rules.len());
         info!(
-            "put relevant rules in your config file: {}",
+            "you can put relevant rules in your config file located at: {}",
             BoxxyConfig::default_config_path()?.display()
         );
     }

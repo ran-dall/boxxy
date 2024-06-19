@@ -525,7 +525,7 @@ impl Enclosure {
             loop {
                 let mut wstatus = -1;
                 let wpid = libc::wait(&mut wstatus);
-                if wpid == -1 && nix::errno::errno() != libc::ECHILD {
+                if wpid == -1 && Errno::last() != Errno::ECHILD {
                     warn!("!!! NOT ECHLD");
                     break;
                 }
