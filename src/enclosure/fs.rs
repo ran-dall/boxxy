@@ -74,7 +74,12 @@ impl FsDriver {
 
     pub fn touch(&self, path: &Path) -> Result<()> {
         debug!("touching {path:?}");
-        match OpenOptions::new().create(true).write(true).open(path) {
+        match OpenOptions::new()
+            .create(true)
+            .truncate(false)
+            .write(true)
+            .open(path)
+        {
             Ok(_) => Ok(()),
             Err(e) => Err(e.into()),
         }
