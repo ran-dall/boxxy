@@ -254,8 +254,8 @@ impl Enclosure {
 
             let rewrite_path = self.fs.fully_expand_path(&rule.rewrite)?;
 
-            debug!("ensuring path: {target_path:?}");
-            debug!("rewriting to: {rewrite_path:?}");
+            debug!("temp files: ensuring path: {target_path:?}");
+            debug!("temp files: rewriting to: {rewrite_path:?}");
 
             match rule.mode {
                 RuleMode::File => {
@@ -272,7 +272,7 @@ impl Enclosure {
                 }
             }
 
-            debug!("rewrote base bath {rewrite_path:?} => {target_path:?}");
+            debug!("temp files: rewrote base path {rewrite_path:?} => {target_path:?}");
         }
 
         Ok(vec![])
@@ -336,8 +336,8 @@ impl Enclosure {
 
             let rewrite_path = self.fs.fully_expand_path(&rule.rewrite)?;
 
-            debug!("source exists: {}", rewrite_path.exists());
-            debug!("target exists: {}", target_path.exists());
+            debug!("rule apply: source exists: {}", rewrite_path.exists());
+            debug!("rule apply: target exists: {}", target_path.exists());
 
             // If the target file doesn't exist, we have to create it in order to bind mount over it.
             match rule.mode {
@@ -359,7 +359,7 @@ impl Enclosure {
                 }
             }
 
-            debug!("rewrote base bath {rewrite_path:?} => {target_path:?}");
+            debug!("rule apply: rewrote base path {rewrite_path:?} => {target_path:?}");
         }
 
         Ok(())
@@ -400,9 +400,7 @@ impl Enclosure {
                     if path.exists() {
                         path
                     } else {
-                        return Err(color_eyre::eyre::eyre!(
-                            "could not resolve binary: {program:?}"
-                        ));
+                        return Err(eyre::eyre!("could not resolve binary: {program:?}"));
                     }
                 }
             }
@@ -451,7 +449,7 @@ impl Enclosure {
 
         if found_appimage_extract && found_appimage_help && found_appimage_mount && !self_extracting
         {
-            return Err(color_eyre::eyre::eyre!(
+            return Err(eyre::eyre!(
                 "{program:?} is an AppImage! Please extract it first with --appimage-extract. You can also use --appimage-extract-and-run. For more information, see https://github.com/AppImage/AppImageKit/wiki/FUSE#fallback",
                 program = self.config.command.get_program()
             ));
