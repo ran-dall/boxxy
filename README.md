@@ -93,6 +93,26 @@ git:(mistress) | ▶
 - stop using symlinks!!!
 - no more dev config files when writing code
 
+## requirements
+
+boxxy requires `newuidmap` to function, which is not included by default in all
+distributions. To install:
+
+Alpine:
+```sh
+$ apk add shadow-uidmap
+```
+
+Debian / Ubuntu:
+```sh
+$ apt install uidmap
+```
+
+RHEL / Fedora:
+```sh
+$ yum install shadow-utils
+```
+
 ## configuration
 
 The boxxy configuration file lives in `~/.config/boxxy/boxxy.yaml`. If none
