@@ -378,7 +378,7 @@ impl Enclosure {
             debug!("removing temporary file {}", file.display());
             std::fs::remove_file(file)?;
         }
-        for dir in &self.created_directories {
+        for dir in (&self.created_directories).iter().rev() {
             debug!("removing temporary directory {}", dir.display());
             std::fs::remove_dir(dir)?;
         }
