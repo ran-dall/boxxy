@@ -26,6 +26,12 @@ rules:
 
 [![asciicast](https://asciinema.org/a/558679.svg)](https://asciinema.org/a/558679)
 
+## maintenance status
+
+I am on a break from maintaining open-source projects due to health reasons.
+PRs will still be accepted and issues will still be looked at, but there are no
+promises about when this will happen.
+
 ## motivation
 
 I recently had to use the AWS CLI. It wants to save data in `~/.aws`, but I
