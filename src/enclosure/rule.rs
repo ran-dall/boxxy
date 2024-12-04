@@ -206,7 +206,7 @@ impl FromStr for RuleMode {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "file" => Ok(RuleMode::File),
-            "directory" => Ok(RuleMode::Directory),
+            "directory" | "dir" => Ok(RuleMode::Directory),
             _ => Err(format!("invalid rule mode: {}", s)),
         }
     }
