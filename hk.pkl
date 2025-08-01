@@ -1,0 +1,53 @@
+// hk.pkl - Practical Rust-focused migration from pre-commit-hooks
+amends "package://github.com/jdx/hk/releases/download/v1.2.0/hk@1.2.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v1.2.0/hk@1.2.0#/Builtins.pkl"
+
+// Core linters - focusing on what matters most for Rust development
+local linters = new Mapping<String, Step> {
+    // Essential file hygiene (simplified from pre-commit-hooks)
+    ["trailing-whitespace"] {
+        glob = List("*.rs", "*.toml", "*.md", "*.yml", "*.yaml")
+        check = "bash -c 'grep -l \"[[:space:]]$\" {{files}} >/dev/null && exit 1 || exit 0'"
+        fix = "sed -i.bak 's/[[:space:]]*$//' {{files}} && find . -name '*.bak' -delete"
+    }
+    
+    // Rust workflow - the core of your development process
+    ["rust-format"] {
+        glob = List("*.rs")
+        workspace_indicator = "Cargo.toml"
+        check = "cargo fmt --all --check"
+        fix = "cargo fmt --all"
+        batch = true  // Enable parallel processing for large codebases
+    }
+    ["rust-clippy"] {
+        glob = List("*.rs")  
+        workspace_indicator = "Cargo.toml"
+        check = "cargo clippy --all-targets --all-features -- -D warnings"
+        depends = List("rust-format")  // Clippy after formatting to avoid conflicts
+    }
+    ["rust-test"] {
+        glob = List("*.rs")
+        workspace_indicator = "Cargo.toml" 
+        check = "cargo test"
+        depends = List("rust-clippy")  // Tests only after linting passes
+        exclusive = true  // Don't run other steps while testing (resource intensive)
+    }
+}
+
+// Hook configuration
+hooks {
+    ["pre-commit"] {
+        fix = true    // Auto-apply fixes when available
+        stash = "git" // Stash unstaged changes during fix operations
+        steps = linters
+    }
+    
+    // Special commands for manual use
+    ["fix"] {
+        fix = true
+        steps = linters
+    }
+    ["check"] {
+        steps = linters
+    }
+}
