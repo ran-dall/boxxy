@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        version: ["stable"]
         BUILD_TARGET: [release] # refers to a cargo profile
 
     permissions:
@@ -23,6 +24,11 @@ jobs:
 
     steps:
       - uses: "actions/checkout@v4"
+      
+      - name: install Rust ${{ matrix.version }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "${{ matrix.version }}"
           
       - name: Cache
         uses: actions/cache@v4
