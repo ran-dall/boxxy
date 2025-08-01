@@ -9,7 +9,7 @@ on:
       - "main"
 
 jobs:
-  build-and-publish:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -23,7 +23,6 @@ jobs:
 
     steps:
       - uses: "actions/checkout@v4"
-      - uses: oras-project/setup-oras@v1
           
       - name: Cache
         uses: actions/cache@v4
@@ -40,15 +39,6 @@ jobs:
       - name: Build binaries in "${{ matrix.BUILD_TARGET }}" mode
         run: cargo build --${{ matrix.BUILD_TARGET }}
       
-      - name: Login to GHCR
-        run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | oras login ghcr.io --password-stdin -u ${{ github.actor }}
-      
-      #  :${GITHUB_REF#refs/tags/}
-      - name: Push binary
-        run: |
-          oras push ghcr.io/${{ github.repository_owner }}/boxxy:pr-${{ github.event.number }} \
-            target/release/boxxy
 
 
 
