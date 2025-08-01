@@ -2,12 +2,12 @@ name: "Run all tests"
 on:
   push:
     branches:
-    - "mistress"
+    - "main"
     paths:
     - "**.rs"
   pull_request:
     branches:
-    - "mistress"
+    - "main"
     paths:
     - "**.rs"
 
@@ -15,16 +15,16 @@ jobs:
   run-tests:
     strategy:
       matrix:
-        version: ["stable", "nightly", "1.67"]
+        version: ["stable", "nightly", "1.88"]
     runs-on: "ubuntu-latest"
     steps:
-    - uses: "actions/checkout@v2"
+    - uses: "actions/checkout@v4"
     - name: "Install latest stable Rust"
       uses: "actions-rs/toolchain@v1"
       with:
         toolchain: "${{ matrix.version }}"
         override: true
-    - uses: "Swatinem/rust-cache@v1"
+    - uses: "Swatinem/rust-cache@v2"
       with:
         key: "tests"
     - name: "Run tests"
