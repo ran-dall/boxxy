@@ -1,0 +1,5 @@
+[tools]
+hk = "latest"
+java = "latest"
+pkl = "latest"
+rust = "latest"
