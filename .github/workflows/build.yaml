@@ -1,5 +1,6 @@
 name: "Build and Publish Rust Binaries"
 on:
+  workflow_dispatch:
   push:
     branches:
       - "main"
@@ -14,18 +15,15 @@ jobs:
       matrix:
         BUILD_TARGET: [release] # refers to a cargo profile
 
-    outputs:
-      release_built: ${{ steps.set-output.outputs.release_built }}
-
     permissions:
-      contents: write
+      contents: read
       packages: write
       attestations: write
       id-token: write
 
     steps:
       - uses: "actions/checkout@v4"
-      
+          
       - name: Cache
         uses: actions/cache@v4
         with:
@@ -40,24 +38,15 @@ jobs:
 
       - name: Build binaries in "${{ matrix.BUILD_TARGET }}" mode
         run: cargo build --${{ matrix.BUILD_TARGET }}
+      
+      - name: Login to GHCR
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | oras login ghcr.io --password-stdin -u ${{ github.actor }}
 
-      # OPTION 1: Using the most popular action - svenstaro/upload-release-action
-      - name: Upload binaries to GitHub Releases
-        if: github.event_name != 'pull_request'
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: target/${{ matrix.BUILD_TARGET }}/*
-          file_glob: true
-          tag: ${{ github.ref_name }}
-          overwrite: true
-          release_name: "Release ${{ github.ref_name }}"
-          body: |
-            ## Changes in this release
-            - Built from commit ${{ github.sha }}
-            - Build profile: ${{ matrix.BUILD_TARGET }}
-            
-            ## Download
-            Download the appropriate binary for your platform below.
+      - name: Push binary
+        run: |
+          oras push ghcr.io/${{ github.repository_owner }}/boxxy:${GITHUB_REF#refs/tags/} \
+            target/release/boxxy
+
 
 

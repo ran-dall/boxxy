@@ -1,5 +1,6 @@
 name: "Run all tests"
 on:
+  workflow_dispatch:
   push:
     branches:
     - "main"
@@ -19,13 +20,15 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
     - uses: "actions/checkout@v4"
-    - name: "Install latest stable Rust"
-      uses: "actions-rs/toolchain@v1"
+      
+    - name: install Rust ${{ matrix.version }}
+      uses: dtolnay/rust-toolchain@master
       with:
         toolchain: "${{ matrix.version }}"
-        override: true
+
     - uses: "Swatinem/rust-cache@v2"
       with:
         key: "tests"
+        
     - name: "Run tests"
       run: "cargo test"

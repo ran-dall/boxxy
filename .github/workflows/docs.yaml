@@ -1,5 +1,6 @@
 name: "Build docs"
 on:
+  workflow_dispatch:
   push:
     branches:
     - "main"
@@ -12,21 +13,23 @@ on:
     - "**.rs"
 
 jobs:
-  run-clippy:
+  docs:
     strategy:
       matrix:
         version: ["stable", "1.88", "nightly"]
-    if: "github.actor != 'dependabot'"
+    if: ${{ github.actor != 'dependabot' }}
     runs-on: "ubuntu-latest"
     steps:
     - uses: "actions/checkout@v4"
-    - name: "Install latest stable Rust"
-      uses: "actions-rs/toolchain@v1"
+      
+    - name: install Rust ${{ matrix.version }}
+      uses: dtolnay/rust-toolchain@master
       with:
         toolchain: "${{ matrix.version }}"
-        override: true
+
     - uses: "Swatinem/rust-cache@v2"
       with:
         key: "doc"
+
     - name: "Run cargo doc"
       run: "cargo doc --workspace --all-features --examples --no-deps --locked"
