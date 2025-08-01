@@ -43,10 +43,11 @@ jobs:
       - name: Login to GHCR
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | oras login ghcr.io --password-stdin -u ${{ github.actor }}
-
+      
+      #  :${GITHUB_REF#refs/tags/}
       - name: Push binary
         run: |
-          oras push ghcr.io/${{ github.repository_owner }}/boxxy:${GITHUB_REF#refs/tags/} \
+          oras push ghcr.io/${{ github.repository_owner }}/boxxy:pr-${{ github.event.number }} \
             target/release/boxxy
 
 
