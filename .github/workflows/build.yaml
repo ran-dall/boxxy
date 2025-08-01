@@ -2,27 +2,77 @@ name: "Ensure packages build"
 on:
   push:
     branches:
-      - "mistress"
+      - "main"
   pull_request:
     branches:
-      - "mistress"
+      - "main"
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        BUILD_TARGET: [debug] # refers to a cargo profile
+
+    outputs:
+      release_built: ${{ steps.set-output.outputs.release_built }}
+
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
     steps:
-      - uses: "actions/checkout@v2"
-      - name: "Install latest stable Rust"
-        uses: "actions-rs/toolchain@v1"
+      - uses: "actions/checkout@v4"
+      
+      - name: Cache
+        uses: actions/cache@v4
         with:
-          toolchain: "stable"
-          override: true
-      - uses: "Swatinem/rust-cache@v1"
-        with:
-          key: "build-pkg"
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-${{ matrix.BUILD_TARGET }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-
+
+      - name: Build binaries in "${{ matrix.BUILD_TARGET }}" mode
+        run: cargo build --profile ${{ matrix.BUILD_TARGET }}
+
       - uses: "queer/actions/peckish_install@mistress"
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
-      - name: "Build debug binary"
-        run: "cargo build"
+          
       - uses: "queer/actions/peckish_run@mistress"
+
+      # THE SIMPLE SOLUTION: Use action-gh-release for GitHub Releases
+      - name: Create GitHub Release with distribution packages
+        if: github.ref_type == 'tag'  # Only create releases for version tags
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/boxxy.deb
+            release/boxxy.rpm
+            release/boxxy.arch.pkg.tar
+            release/boxxy.tar
+            release/boxxy
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'dev') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Keep artifact upload for non-release builds (PRs, mistress pushes)
+      - name: Upload build artifacts
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: boxxy-packages-${{ matrix.BUILD_TARGET }}-${{ github.sha }}
+          path: release/
+          retention-days: ${{ github.event_name == 'pull_request' && 7 || 30 }}
+
