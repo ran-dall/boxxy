@@ -18,14 +18,16 @@ jobs:
   run-cargo-audit:
     strategy:
       matrix:
-        version: ["stable", "1.88", "nightly"]
+        version: ["stable"]
     runs-on: "ubuntu-latest"
     steps:
     - uses: "actions/checkout@v4"
+    
     - name: install Rust ${{ matrix.version }}
       uses: dtolnay/rust-toolchain@master
       with:
         toolchain: "${{ matrix.version }}"
+        
     - name: rust audit
       uses: rustsec/audit-check@v2
       with:

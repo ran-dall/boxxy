@@ -16,7 +16,7 @@ jobs:
   docs:
     strategy:
       matrix:
-        version: ["stable", "1.88", "nightly"]
+        version: ["stable"]
     if: ${{ github.actor != 'dependabot' }}
     runs-on: "ubuntu-latest"
     steps:

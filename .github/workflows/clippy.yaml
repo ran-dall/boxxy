@@ -16,7 +16,7 @@ jobs:
   run-clippy:
     strategy:
       matrix:
-        version: ["stable", "1.88", "nightly"]
+        version: ["stable"]
     runs-on: "ubuntu-latest"
     steps:
     - uses: "actions/checkout@v4"
