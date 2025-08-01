@@ -42,6 +42,15 @@ hooks {
         steps = linters
     }
     
+    // Add pre-push hook (lighter checks for push)
+    ["pre-push"] {
+        fix = false   // Don't auto-fix on push, just check
+        steps = new Mapping<String, Step> {
+            ["rust-clippy"] = linters["rust-clippy"]  // Only run clippy on push
+            ["rust-test"] = linters["rust-test"]      // And tests
+        }
+    }
+    
     // Special commands for manual use
     ["fix"] {
         fix = true
