@@ -1,4 +1,4 @@
-name: "Ensure packages build"
+name: "Build and Publish Rust Binaries"
 on:
   push:
     branches:
@@ -7,22 +7,18 @@ on:
     branches:
       - "main"
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
 jobs:
-  build:
+  build-and-publish:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        BUILD_TARGET: [debug] # refers to a cargo profile
+        BUILD_TARGET: [release] # refers to a cargo profile
 
     outputs:
       release_built: ${{ steps.set-output.outputs.release_built }}
 
     permissions:
-      contents: read
+      contents: write
       packages: write
       attestations: write
       id-token: write
@@ -40,39 +36,28 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-${{ matrix.BUILD_TARGET }}
           restore-keys: |
             ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-
+            ${{ runner.os }}-cargo-
 
       - name: Build binaries in "${{ matrix.BUILD_TARGET }}" mode
-        run: cargo build --profile ${{ matrix.BUILD_TARGET }}
+        run: cargo build --${{ matrix.BUILD_TARGET }}
 
-      - uses: "queer/actions/peckish_install@mistress"
+      # OPTION 1: Using the most popular action - svenstaro/upload-release-action
+      - name: Upload binaries to GitHub Releases
+        if: github.event_name != 'pull_request'
+        uses: svenstaro/upload-release-action@v2
         with:
-          token: "${{ secrets.GITHUB_TOKEN }}"
-          
-      - uses: "queer/actions/peckish_run@mistress"
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/${{ matrix.BUILD_TARGET }}/*
+          file_glob: true
+          tag: ${{ github.ref_name }}
+          overwrite: true
+          release_name: "Release ${{ github.ref_name }}"
+          body: |
+            ## Changes in this release
+            - Built from commit ${{ github.sha }}
+            - Build profile: ${{ matrix.BUILD_TARGET }}
+            
+            ## Download
+            Download the appropriate binary for your platform below.
 
-      # THE SIMPLE SOLUTION: Use action-gh-release for GitHub Releases
-      - name: Create GitHub Release with distribution packages
-        if: github.ref_type == 'tag'  # Only create releases for version tags
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            release/boxxy.deb
-            release/boxxy.rpm
-            release/boxxy.arch.pkg.tar
-            release/boxxy.tar
-            release/boxxy
-          generate_release_notes: true
-          draft: false
-          prerelease: ${{ contains(github.ref_name, 'dev') }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Keep artifact upload for non-release builds (PRs, mistress pushes)
-      - name: Upload build artifacts
-        if: github.ref_type != 'tag'
-        uses: actions/upload-artifact@v4
-        with:
-          name: boxxy-packages-${{ matrix.BUILD_TARGET }}-${{ github.sha }}
-          path: release/
-          retention-days: ${{ github.event_name == 'pull_request' && 7 || 30 }}
 
