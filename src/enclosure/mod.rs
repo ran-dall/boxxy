@@ -69,7 +69,7 @@ impl Enclosure {
         let callback = || match self.run_in_container(applicable_rules) {
             Ok(exit_code) => exit_code,
             Err(err) => {
-                error!("{}", err);
+                error!("{err}");
                 -1isize
             }
         };
@@ -289,7 +289,7 @@ impl Enclosure {
                 let dotenv = parse_dotenv(&read_to_string(dotenv_file)?).unwrap();
                 for (key, value) in dotenv.iter() {
                     self.config.command.env(key, value);
-                    debug!("loaded env var: {}=********", key);
+                    debug!("loaded env var: {key}=********");
                 }
                 info!("loaded {} env vars", dotenv.len());
             }
@@ -299,7 +299,7 @@ impl Enclosure {
         for rule in applicable_rules {
             for (key, value) in rule.env.iter() {
                 self.config.command.env(key, value);
-                debug!("loaded env var: {}=********", key);
+                debug!("loaded env var: {key}=********");
             }
             if !rule.env.is_empty() {
                 debug!(
@@ -378,7 +378,7 @@ impl Enclosure {
             debug!("removing temporary file {}", file.display());
             std::fs::remove_file(file)?;
         }
-        for dir in (&self.created_directories).iter().rev() {
+        for dir in self.created_directories.iter().rev() {
             debug!("removing temporary directory {}", dir.display());
             std::fs::remove_dir(dir)?;
         }
@@ -539,7 +539,7 @@ impl Enclosure {
             exit_status
         };
 
-        debug!("command exited with status: {:?}", child);
+        debug!("command exited with status: {child:?}");
 
         Ok(child_exit_status.try_into()?)
     }

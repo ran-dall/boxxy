@@ -161,14 +161,8 @@ impl Rule {
         }
 
         // Resolve both program and rule_binary with `which` and compare. ex. /usr/bin/ls == /usr/bin/ls
-        let which_rule_binary = match which::which(rule_binary) {
-            Ok(which_rule_binary) => Some(which_rule_binary),
-            Err(_) => None,
-        };
-        let which_user_program = match which::which(program) {
-            Ok(which_user_program) => Some(which_user_program),
-            Err(_) => None,
-        };
+        let which_rule_binary = which::which(rule_binary).ok();
+        let which_user_program = which::which(program).ok();
         debug!("{}: comparing binaries with which(1): which_user_program={which_user_program:?}, which_rule_binary={which_rule_binary:?}", self.name);
         if which_rule_binary == which_user_program
             && (which_rule_binary.is_some() || which_user_program.is_some())
@@ -207,7 +201,7 @@ impl FromStr for RuleMode {
         match s {
             "file" => Ok(RuleMode::File),
             "directory" | "dir" => Ok(RuleMode::Directory),
-            _ => Err(format!("invalid rule mode: {}", s)),
+            _ => Err(format!("invalid rule mode: {s}")),
         }
     }
 }

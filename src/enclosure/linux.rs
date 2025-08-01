@@ -29,7 +29,7 @@ pub fn map_uids<I: Into<i32>>(pid: I, uids: &mut HashMap<Uid, Uid>) -> Result<()
         return map_uids(pid, uids);
     }
 
-    debug!("mapped uids {:#?}", uids);
+    debug!("mapped uids {uids:#?}");
 
     Ok(())
 }
@@ -57,7 +57,7 @@ pub fn map_gids<I: Into<i32>>(pid: I, gids: &mut HashMap<Gid, Gid>) -> Result<()
         return map_gids(pid, gids);
     }
 
-    debug!("mapped gids {:#?}", gids);
+    debug!("mapped gids {gids:#?}");
 
     Ok(())
 }

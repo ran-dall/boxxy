@@ -24,13 +24,13 @@ impl FsDriver {
     }
 
     pub fn setup_root(&self, name: &str) -> Result<()> {
-        debug!("setting up root for {}", name);
+        debug!("setting up root for {name}");
         fs::create_dir_all(self.container_root(name))?;
         Ok(())
     }
 
     pub fn cleanup_root(&self, name: &str) -> Result<()> {
-        debug!("cleaning up root for {}", name);
+        debug!("cleaning up root for {name}");
         fs::remove_dir_all(self.container_root(name))?;
         Ok(())
     }
