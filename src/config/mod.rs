@@ -165,7 +165,7 @@ impl BoxxyConfig {
         if which::which(cmd).is_err() {
             // If `which` can't find it, check if the path exists.
             if !Path::new(cmd).exists() {
-                error!("command not found in $PATH or by path: {}", cmd);
+                error!("command not found in $PATH or by path: {cmd}");
                 debug!("searched $PATH: {}", std::env::var("PATH")?);
                 std::process::exit(1);
             }

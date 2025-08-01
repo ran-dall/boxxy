@@ -3,3 +3,10 @@ hk = "latest"
 java = "latest"
 pkl = "latest"
 rust = "latest"
+
+[tasks]
+build = "cargo build --release"
+test = "cargo test --release"
+lint = "cargo clippy --release -- -D warnings"
+format = "cargo fmt --all -- --check"
+check = "cargo check --release"
