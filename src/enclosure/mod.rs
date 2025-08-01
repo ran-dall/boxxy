@@ -282,7 +282,7 @@ impl Enclosure {
         // Load .env vars
         if self.config.dotenv {
             debug!("dotenv enabled!");
-            if let Ok(dotenv_file) = dotenv::dotenv() {
+            if let Ok(dotenv_file) = dotenvy::dotenv() {
                 debug!("found dotenv path: {dotenv_file:?}");
                 info!("loading env vars from {}", dotenv_file.display());
                 // TODO: bleh error handling
