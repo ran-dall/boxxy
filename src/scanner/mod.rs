@@ -14,8 +14,8 @@ pub struct Scanner {
     pub apps: Vec<App>,
 }
 
-const HARDCODED_APPS_JSON: &str = include_str!("../../vendor/hardcoded-applications.json");
-const PARTIAL_APPS_JSON: &str = include_str!("../../vendor/partial-support-applications.json");
+const HARDCODED_APPS_JSON: &str = include_str!("../../assets/hardcoded-applications.json");
+const PARTIAL_APPS_JSON: &str = include_str!("../../assets/partial-support-applications.json");
 
 impl Scanner {
     #[allow(clippy::new_without_default)]
